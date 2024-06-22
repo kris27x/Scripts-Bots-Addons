@@ -1,19 +1,27 @@
+/* Hide the tutorial element initially */
 $('#tutorial').hide();
+
+/* Initialize MBob object with default properties */
 MBob = {};
-MBob.bestxy = 9999;
-MBob.run = 0;
-MBob.id = 0;
-MBob.blok = "";
-MBob.xxxx = 0;
-MBob.blokuj = 1;
-MBob.checker = 0;
-MBob.checker2 = 0;
-MBob.interv1 = "";
-MBob.interv2 = "";
-MBob.interv3 = "";
+MBob.bestxy = 9999;  /* Default best distance */
+MBob.run = 0;        /* Run status */
+MBob.id = 0;         /* ID of target */
+MBob.blok = "";      /* Blocked items */
+MBob.xxxx = 0;       /* Temporary variable */
+MBob.blokuj = 1;     /* Block status */
+MBob.checker = 0;    /* Checker status */
+MBob.checker2 = 0;   /* Secondary checker status */
+MBob.interv1 = "";   /* Interval 1 */
+MBob.interv2 = "";   /* Interval 2 */
+MBob.interv3 = "";   /* Interval 3 */
+
+/* Function to display an alert (currently empty) */
 mAlert = function(a, c, d, B) {};
+
+/* Function to add lock (currently empty) */
 g.lock.add = function(i) {};
 
+/* Create and style configuration div, then append to centerbox2 */
 $('<div id="MBob_config"><div id="MBob_config_header" style="cursor:move;">Drag here</div></div>').css({
     position: "absolute",
     left: -300,
@@ -28,6 +36,7 @@ $('<div id="MBob_config"><div id="MBob_config_header" style="cursor:move;">Drag 
     "border-radius": "10px"
 }).appendTo("#centerbox2");
 
+/* Add HTML content to MBob_config element */
 MBob_config.innerHTML += `
     <center>
         <input id="MBob_nazpotwor" placeholder="mob names" class="input-field">
@@ -45,6 +54,7 @@ MBob_config.innerHTML += `
     </center>
 `;
 
+/* Create and append style element for input fields and buttons */
 const style = document.createElement('style');
 style.innerHTML = `
     .input-field {
@@ -95,6 +105,7 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
+/* Function to drop items based on conditions */
 MBob.drop = function() {
     if (dropneut.checked == true && (g.bags[0][0] - g.bags[0][1] <= 2)) {
         for (var i in g.item) {
@@ -107,6 +118,7 @@ MBob.drop = function() {
     }
 };
 
+/* Function to heal hero based on conditions */
 MBob.heal = function() {
     for (var i in g.item) {
         if (g.item[i].cl == 16 && hero.hp <= hero.maxhp * Number(MBob_healerhp.value) / 100 && MBob_healerhp.value != "") {
@@ -115,6 +127,7 @@ MBob.heal = function() {
     }
 };
 
+/* Function to reload items based on conditions */
 MBob.rel = function() {
     var sukces = false;
     for (var i in g.item) {
@@ -145,6 +158,7 @@ MBob.rel = function() {
     }
 };
 
+/* Function for hero movement with pathfinding */
 hero.MBobgo = function(y, w) {
     var x = [],
         t = (hero.opt & 128) ? 8 : 20;
@@ -246,6 +260,7 @@ hero.MBobgo = function(y, w) {
     }
 };
 
+/* Overriding battleMsg function to include MBob functionalities */
 var tmpBattleMsg = battleMsg;
 battleMsg = function(c, t) {
     MBob.run = 0;
@@ -261,6 +276,7 @@ battleMsg = function(c, t) {
     return ret;
 };
 
+/* Function to find and target nearest mob */
 MBob.func1 = function() {
     if (MBob.run == 0) {
         hero.nextx = '';
@@ -288,6 +304,7 @@ MBob.func1 = function() {
     }
 };
 
+/* Function to check and handle mob engagement */
 MBob.func2 = function() {
     if (road.length == 0 && MBob.blokuj == 0) {
         if ((Math.abs(hero.rx - g.npc[MBob.id].x) <= 1 && Math.abs(hero.ry - g.npc[MBob.id].y) <= 1) && (g.npc[MBob.id].type == 2 || g.npc[MBob.id].type == 3)) {
@@ -306,6 +323,7 @@ MBob.func2 = function() {
     }
 };
 
+/* Function to manage run state based on checker */
 MBob.func3 = function() {
     if (road.length == 0) {
         if (MBob.checker < 60) {
@@ -319,12 +337,14 @@ MBob.func3 = function() {
     }
 };
 
+/* Start interval functions for MBob */
 MBob.start1 = function() {
     MBob.interv1 = setInterval(MBob.func1, 400);
     MBob.interv2 = setInterval(MBob.func2, 300);
     MBob.interv3 = setInterval(MBob.func3, 50);
 };
 
+/* Stop interval functions for MBob and reset properties */
 MBob.stop1 = function() {
     clearInterval(MBob.interv1);
     clearInterval(MBob.interv2);
@@ -342,14 +362,17 @@ MBob.stop1 = function() {
     MBob.interv3 = "";
 };
 
+/* Reset MBob.blok every 30 seconds */
 setInterval(function() {
     MBob.blok = "";
 }, 30000);
 
+/* Make an element draggable using another element as the handle */
 function makeDraggable(element, handle) {
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
     handle.onmousedown = dragMouseDown;
 
+    /* Function to handle mouse down event for dragging */
     function dragMouseDown(e) {
         e = e || window.event;
         e.preventDefault();
@@ -359,6 +382,7 @@ function makeDraggable(element, handle) {
         document.onmousemove = elementDrag;
     }
 
+    /* Function to handle element dragging */
     function elementDrag(e) {
         e = e || window.event;
         e.preventDefault();
@@ -370,10 +394,12 @@ function makeDraggable(element, handle) {
         element.style.left = (element.offsetLeft - pos1) + "px";
     }
 
+    /* Function to stop dragging */
     function closeDragElement() {
         document.onmouseup = null;
         document.onmousemove = null;
     }
 }
 
+/* Make the MBob_config element draggable using its header */
 makeDraggable(document.getElementById("MBob_config"), document.getElementById("MBob_config_header"));
